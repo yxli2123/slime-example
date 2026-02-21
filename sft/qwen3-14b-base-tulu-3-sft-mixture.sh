@@ -49,7 +49,7 @@ PYTHONPATH=/root/Megatron-LM python tools/convert_hf_to_torch_dist.py \
 HF_TRAIN_DATA=allenai/tulu-3-sft-mixture
 LOCAL_TRAIN_DATA=/root/data/${HF_TRAIN_DATA}.jsonl
 
-python ${SCRIPT_DIR}/convert_to_slime_sft_data.py \
+python ${SCRIPT_DIR}/convert_to_slime_data.py \
 --hf-data ${HF_TRAIN_DATA} \
 --local-data ${LOCAL_TRAIN_DATA} \
 --input-key messages
