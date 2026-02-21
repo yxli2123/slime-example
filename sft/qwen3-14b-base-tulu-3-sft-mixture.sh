@@ -40,9 +40,9 @@ hf download ${HF_REPO_ID} --local-dir ${HF_MODEL_PATH}
 
 # Convert HF models to Megatron models.
 PYTHONPATH=/root/Megatron-LM python tools/convert_hf_to_torch_dist.py \
-    ${MODEL_ARGS[@]} \
-    --hf-checkpoint ${HF_MODEL_PATH} \
-    --save ${MEGATRON_MODEL_PATH}
+  ${MODEL_ARGS[@]} \
+  --hf-checkpoint ${HF_MODEL_PATH} \
+  --save ${MEGATRON_MODEL_PATH}
 
 
 # ========== Download SFT data ==========
@@ -50,9 +50,9 @@ HF_TRAIN_DATA=allenai/tulu-3-sft-mixture
 LOCAL_TRAIN_DATA=/root/data/${HF_TRAIN_DATA}.jsonl
 
 python ${SCRIPT_DIR}/convert_to_slime_data.py \
---hf-data ${HF_TRAIN_DATA} \
---local-data ${LOCAL_TRAIN_DATA} \
---input-key messages
+  --hf-data ${HF_TRAIN_DATA} \
+  --local-data ${LOCAL_TRAIN_DATA} \
+  --input-key messages
 
 
 # ========== Experiment Configs ==========
