@@ -48,7 +48,7 @@ def main():
                 keep_flag = False
 
             # If content is not a text, filter our.
-            if isinstance(msg.get("content"), str):
+            if not isinstance(msg.get("content"), str):
                 keep_flag = False
 
         if keep_flag:
