@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--hf-data", type=str, required=True)
     parser.add_argument("--local-data", type=str, required=True)
     parser.add_argument("--input-key", type=str, default="messages")
+    parser.add_argument("--max-turns", type=int)
 
     args = parser.parse_args()
 
@@ -34,10 +35,20 @@ def main():
     filtered_data = []
     for d in data:
         keep_flag = True
-        for msg in d[args.input_key]:
-            if "role" not in msg:
+        for turn_id, msg in enumerate(d[args.input_key]):
+            # If num of turns greater than args.max_turns, filter out.
+            if args.max_turns and turn_id // 2 >= args.max_turns:
                 keep_flag = False
-            if "content" not in msg or msg["content"] is None:
+                break
+
+            # If not user and assistant in turn, filter out.
+            if turn_id % 2 == 0 and msg.get("role") != "user":
+                keep_flag = False
+            elif turn_id % 2 == 1 and msg.get("role") != "assistant":
+                keep_flag = False
+
+            # If content is not a text, filter our.
+            if isinstance(msg.get("content"), str):
                 keep_flag = False
 
         if keep_flag:

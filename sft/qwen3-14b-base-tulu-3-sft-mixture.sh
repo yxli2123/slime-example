@@ -52,7 +52,8 @@ LOCAL_TRAIN_DATA=/root/data/${HF_TRAIN_DATA}.jsonl
 python ${SCRIPT_DIR}/convert_to_slime_data.py \
   --hf-data ${HF_TRAIN_DATA} \
   --local-data ${LOCAL_TRAIN_DATA} \
-  --input-key messages
+  --input-key messages \
+  --max-turns 4
 
 
 # ========== Experiment Configs ==========
