@@ -35,9 +35,14 @@ def main():
     filtered_data = []
     for d in data:
         keep_flag = True
+        word_cnt = 0
         for turn_id, msg in enumerate(d[args.input_key]):
             # If num of turns greater than args.max_turns, filter out.
             if args.max_turns and turn_id // 2 >= args.max_turns:
+                keep_flag = False
+                break
+
+            if word_cnt >= 2024:
                 keep_flag = False
                 break
 
@@ -50,6 +55,8 @@ def main():
             # If content is not a text, filter our.
             if not isinstance(msg.get("content"), str):
                 keep_flag = False
+            else:
+                word_cnt += len(msg.get("content").split(" "))
 
         if keep_flag:
             filtered_data.append(d)
