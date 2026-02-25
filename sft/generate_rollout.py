@@ -57,9 +57,9 @@ class MultiTurnLossMaskGenerator:
 
         for i, message in enumerate(messages):
             if i == 0:
-                message_ids = self.tokenizer.apply_chat_template([message], tokenize=True, tools=tools)["input_ids"]
+                message_ids = self.tokenizer.apply_chat_template([message], tokenize=True, tools=tools)
             else:
-                message_ids = self.tokenizer.apply_chat_template([message], tokenize=True)["input_ids"]
+                message_ids = self.tokenizer.apply_chat_template([message], tokenize=True)
 
             if message["role"] != "system" and i > 0:
                 message_ids = message_ids[self.system_message_length :]
@@ -92,15 +92,15 @@ class MultiTurnLossMaskGenerator:
         for i, msg in enumerate(messages):
             # Ignore the system prompt is it is not the first in the `messages`.
             if msg["role"] == "system" and i == 0:
-                message_ids = self.tokenizer.apply_chat_template([msg], tokenize=True)["input_ids"]
+                message_ids = self.tokenizer.apply_chat_template([msg], tokenize=True)
                 loss_mask = [0] * len(message_ids)
             elif msg["role"] == "user":
-                message_ids = self.tokenizer.apply_chat_template([msg], tokenize=True, add_generation_prompt=True)["input_ids"]
+                message_ids = self.tokenizer.apply_chat_template([msg], tokenize=True, add_generation_prompt=True)
                 loss_mask = [0] * len(message_ids)
             elif msg["role"] == "assistant":
                 dump_user_query = "hello world"
-                message_ids_combined = self.tokenizer.apply_chat_template([dump_user_query, msg], tokenize=True)["input_ids"]
-                message_ids_users = self.tokenizer.apply_chat_template([dump_user_query], tokenize=True, add_generation_prompt=True)["input_ids"]
+                message_ids_combined = self.tokenizer.apply_chat_template([dump_user_query, msg], tokenize=True)
+                message_ids_users = self.tokenizer.apply_chat_template([dump_user_query], tokenize=True, add_generation_prompt=True)
                 message_ids = message_ids_combined[len(message_ids_users):]
                 loss_mask = [1] * len(message_ids)
             else:
@@ -124,10 +124,10 @@ class MultiTurnLossMaskGenerator:
             if i == 0:
                 tailed_message_ids = self.tokenizer.apply_chat_template(
                     [message, prefix_message], tokenize=True, tools=tools
-                )["input_ids"]
+                )
                 message_ids = tailed_message_ids[: -len(prefix_token_ids)]
             else:
-                prefixed_message_ids = self.tokenizer.apply_chat_template([prefix_message, message], tokenize=True)["input_ids"]
+                prefixed_message_ids = self.tokenizer.apply_chat_template([prefix_message, message], tokenize=True)
                 message_ids = prefixed_message_ids[len(prefix_token_ids) :]
 
             if message["role"] != "system" and i > 0:
