@@ -75,7 +75,7 @@ CKPT_ARGS=(
 )
 
 SFT_ARGS=(
-   --rollout-function-path slime.rollout.sft_rollout.generate_rollout
+   --rollout-function-path generate_rollout.generate_rollout
    --prompt-data ${LOCAL_TRAIN_DATA}
    --input-key messages
    --rollout-shuffle
@@ -84,7 +84,7 @@ SFT_ARGS=(
    --global-batch-size ${BATCH_SIZE}
 
    --loss-type sft_loss
-   --loss-mask-type qwen3
+   --loss-mask-type qwen_simple
    --calculate-per-token-loss
    --disable-compute-advantages-and-returns
    --debug-train-only
