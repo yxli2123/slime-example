@@ -271,6 +271,7 @@ def evaluate(
     base_url,
     api_key,
     model_name: str = "openai.gpt-oss-20b-1:0",
+    verify_helpfulness_rate: float = 0.0
 ) -> list[bool]:
 
     results = []
@@ -296,7 +297,7 @@ def evaluate(
 
             answer = all(inner_result)
 
-            do_helpfulness = random.random() < 0.1
+            do_helpfulness = random.random() < verify_helpfulness_rate
             if do_helpfulness:
                 prompt = [
                     {
@@ -382,6 +383,7 @@ async def reward_func(args, sample, **kwargs) -> float:
             constraint_pool=INDEXED_CONSTRAIN_POOL,
             base_url=args.judge_base_url,
             api_key=api_key,
+            verify_helpfulness_rate=args.verify_helpfulness_rate,
         )
         passed.append(all(turn_passed))
 

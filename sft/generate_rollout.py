@@ -264,13 +264,13 @@ def generate_rollout(args, rollout_id, data_buffer, evaluation=False):
         tools = sample.metadata.get("tools", None)
 
         token_ids, loss_mask = MASK_GENERATOR.get_loss_mask(messages, tools=tools)
-
         response_length = MASK_GENERATOR.get_response_lengths([loss_mask])[0]
+        loss_mask = loss_mask[-response_length:]
 
         sample.tokens = token_ids
         sample.response_length = response_length
         sample.reward = 0
-        sample.loss_mask = loss_mask[-response_length:]
+        sample.loss_mask = loss_mask
 
         if i == 0 and not SAMPLE_PRINTED:
             logger.info(f"sft_rollout::generate_rollout example sample: {sample=}")
