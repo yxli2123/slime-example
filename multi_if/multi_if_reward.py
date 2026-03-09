@@ -18,9 +18,27 @@ from aws_bedrock_token_generator import provide_token
 from slime.utils.types import Sample
 
 PROMPT_SOFT_EVALUATION = """Your task is to verify if the given response satisfies the given constraint. 
-You don't need to verify any other information except for the given constraint.
+You should also verify if the given response makes sense and is generally helpful. 
 
-Return yes if the response satisfy the constraint, otherwise no. Wrap your verification (yes or no) in a XML tag:
+If the response does not satisfy the constraint, return no.
+If the response satisfies the constraint, but is not helpful, return no.
+Otherwise, return yes.
+Wrap your verification (yes or no) in a XML tag:
+<answer>yes or no</answer>
+
+**Constraint**
+{constraint}
+
+**Response**
+{response}
+"""
+
+PROMPT_HELPFULNESS_EVALUATION = """Your task is to verify if the given response makes sense and is generally helpful. 
+Unhelpful responses include but are not limited to severely incomplete sentences, keeping repeating the same content, or overly simplified responses.
+Unless the constraints require the response to do so, above is considered as unhelpful.
+
+If the given response is unhelpful, return no. Otherwise, return yes.
+Wrap your verification (yes or no) in a XML tag:
 <answer>yes or no</answer>
 
 **Constraint**
@@ -263,6 +281,7 @@ def evaluate(
         content_template: bool = constraint_info["content_template"]
         func_input = {"response": response, "placeholder": _placeholder} if content_template else {"response": response}
         inner_result = []
+        constraint = constraint_info["constraint"]
 
         if verifier_type == "hard":
             func: list[str] = constraint_info["func"]
@@ -275,10 +294,33 @@ def evaluate(
                     answer = False
                 inner_result.append(answer)
 
-            results.append(all(inner_result))
+            answer = all(inner_result)
+
+            do_helpfulness = random.random() < 0.1
+            if do_helpfulness:
+                prompt = [
+                    {
+                        "role": "user",
+                        "content": PROMPT_HELPFULNESS_EVALUATION.format(response=response, constraint=constraint),
+                    }
+                ]
+                try:
+                    _, answer_list = call_api(base_url, api_key, model_name, prompt, 0.1, 2048, 0.95, 1)
+                    answer_str: str = answer_list[0]
+                    answer_str = extract_content_within_tag(answer_str, "answer")
+
+                    logging.info(f"===>Helpfulness API result: {answer_str}")
+
+                    is_helpful = True if answer_str is not None and answer_str.lower() == "yes" else False
+                except Exception as e:
+                    logging.error(f"Failed to call judge: {e}")
+                    is_helpful = True
+
+                answer = answer if is_helpful else False
+
+            results.append(answer)
 
         else:
-            constraint = constraint_info["constraint"]
             prompt = [
                 {
                     "role": "user",
@@ -290,14 +332,13 @@ def evaluate(
                 answer_str: str = answer_list[0]
                 answer_str = extract_content_within_tag(answer_str, "answer")
 
-                logging.info(f"===> API result: {answer_str}")
+                logging.info(f"===> Soft API result: {answer_str}")
 
                 answer = True if answer_str is not None and answer_str.lower() == "yes" else False
             except Exception as e:
                 logging.error(f"Failed to call judge: {e}")
                 answer = True
 
-            # answer = True
             results.append(answer)
 
     return results
