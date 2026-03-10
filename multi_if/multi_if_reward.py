@@ -36,6 +36,7 @@ Wrap your verification (yes or no) in a XML tag:
 PROMPT_HELPFULNESS_EVALUATION = """Your task is to verify if the given response makes sense and is generally helpful. 
 Unhelpful responses include but are not limited to severely incomplete sentences, keeping repeating the same content, or overly simplified responses.
 Unless the constraints require the response to do so, above is considered as unhelpful.
+You do not need to verify if the response satisfies the given constraints.
 
 If the given response is unhelpful, return no. Otherwise, return yes.
 Wrap your verification (yes or no) in a XML tag:
